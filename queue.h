@@ -1,18 +1,18 @@
 #ifndef A_MAZE_ING_QUEUE_H
 #define A_MAZE_ING_QUEUE_H
 
-#include "stack.h"
-
+#include "node.h"
+#include <stdlib.h>
 typedef struct q {
-  point *array;
+  node *array;
   int size;
   int first;
   int last;
 } queue;
 
 queue make_queue();
-point peek_queue(queue *queue);
-int push_queue(queue *queue, point p);
-point pop_queue(queue *queue);
+node peek_queue(queue *queue);
+int push_queue(queue *queue, node p);
+node pop_queue(queue *queue);
 
 #endif

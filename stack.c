@@ -10,7 +10,7 @@ stack make_stack() {
   return s;
 }
 
-int push_stack(stack *s, point p) {
+int push_stack(stack *s, node p) {
   if (s->last == s->size - 1) {
     s->array = realloc(s->array, s->size * 2 * sizeof *(s->array));
     if (s->array == NULL) {
@@ -24,12 +24,12 @@ int push_stack(stack *s, point p) {
   return 0;
 }
 
-point pop_stack(stack *stack) {
-  point p = stack->array[stack->last];
+node pop_stack(stack *stack) {
+  node p = stack->array[stack->last];
 
   stack->last--;
 
   return p;
 }
 
-point peek_stack(stack *stack) { return stack->array[stack->last]; }
+node peek_stack(stack *stack) { return stack->array[stack->last]; }
