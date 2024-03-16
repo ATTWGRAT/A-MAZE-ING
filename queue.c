@@ -9,7 +9,7 @@ queue make_queue() {
   return q;
 }
 
-int push_queue(queue *queue, node p) {
+int push_queue(queue *queue, snode p) {
   if (queue->first == -1) {
     queue->array[0] = p;
     queue->first++;
@@ -27,7 +27,7 @@ int push_queue(queue *queue, node p) {
       queue->last = 0;
     }
   } else if (queue->first - 1 == queue->last) {
-    node *temp = malloc(queue->size * 2 * sizeof *(queue->array));
+    snode *temp = malloc(queue->size * 2 * sizeof *(queue->array));
     if (temp == NULL) {
       return -1;
     }
@@ -52,11 +52,11 @@ int push_queue(queue *queue, node p) {
   return 0;
 }
 
-node peek_queue(queue *queue) { return queue->array[queue->first]; }
+snode peek_queue(queue *queue) { return queue->array[queue->first]; }
 
-node pop_queue(queue *queue) {
+snode pop_queue(queue *queue) {
   if (queue->first == queue->last) {
-    node p = queue->array[queue->first];
+    snode p = queue->array[queue->first];
     queue->first = -1;
     queue->last = -1;
     return p;

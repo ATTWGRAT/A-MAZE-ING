@@ -3,10 +3,23 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "node.h"
 
 #define NODE_OFFSET 36 //Each node is 9 ints or 36 bytes
 #define DJ_LENGTH_OFFSET 32 //Not skipping last int
+
+typedef struct e {
+    int next;
+    int length;
+} edge;
+
+typedef struct n {
+    int nr;
+    edge nextN;
+    edge nextE;
+    edge nextS;
+    edge nextW;
+    int dj_length;
+} node;
 
 typedef struct f{
     FILE* file;
