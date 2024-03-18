@@ -1,12 +1,11 @@
-#include "stack.h"
 #include "way_out.h"
-#include <stdio.h>
+
 void print_way_out(stack *s){
     printf("START\n");
     linked_node starting_node = peek_stack(s);
     enum direction last_dir = starting_node.dir;
     int last_length = 0;
-    while(is_stack_empty(s) != -1){
+    while(!is_stack_empty(s)){
         linked_node node = pop_stack(s);
         enum direction dir = node.dir;
         int lenght = node.length;
@@ -61,5 +60,5 @@ void print_way_out(stack *s){
         last_length = lenght;
     }
     printf("FORWARD %d\n",last_length);
-    printf("END");
+    printf("END\n");
 }

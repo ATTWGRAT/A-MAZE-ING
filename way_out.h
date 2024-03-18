@@ -4,7 +4,8 @@
 
 #ifndef A_MAZE_ING_WAY_OUT_H
 #define A_MAZE_ING_WAY_OUT_H
-
+#include <stdio.h>
+#include "stack.h"
 void print_way_out(stack *s);
 
 #endif //A_MAZE_ING_WAY_OUT_H
