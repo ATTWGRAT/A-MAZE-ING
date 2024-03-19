@@ -10,7 +10,7 @@ enum direction{
 int is_node(enum direction d, int x, int y, mazemap m);
 
 typedef struct n {
-    int x, y;
+    int x, y, nr;
 } node;
 
 typedef struct e {
@@ -19,6 +19,7 @@ typedef struct e {
 } edge;
 
 typedef struct b {
+    node n;
     edge nextN;
     edge nextE;
     edge nextS;
