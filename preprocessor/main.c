@@ -1,58 +1,98 @@
+#include <ctype.h>
 #include <stdio.h>
-#include "fileio.h"
-#include "algo.h"
+#include <unistd.h>
+#include <stdlib.h>
+
+#define HELP_FLAG (void*) 0xffffffffffffffff
+
+typedef struct _preprocessorargs{
+    int x, y;
+    FILE* plik;
+    char is_txt;
+} args;
+
+args* parse_args(int argc, char** argv)
+{
+    args* parsed = malloc(sizeof*parsed);
+    parsed->is_txt = 1;
+    parsed->x = -1;
+    parsed->y = -1;
+    parsed->plik = NULL;
+
+    char temp;
+
+    while((temp = getopt (argc, argv, "x:y:f:ch")) != -1){
+        switch (temp) {
+            case 'x':
+                if(atoi(optarg) < 2 || (atoi(optarg) > 1024)){
+                    fprintf(stderr, "Podana wartość nie jest liczbą z przedziału <2; 1024>: -%c %s\n", temp, optarg);
+                    return NULL;
+                }
+                parsed->x = atoi(optarg);
+                break;
+
+            case 'y':
+                if(atoi(optarg) < 2 || (atoi(optarg) > 1024)){
+                    fprintf(stderr, "Podana wartość nie jest liczbą z przedziału <2; 1024>: -%c %s\n", temp, optarg);
+                    return NULL;
+                }
+                parsed->y = atoi(optarg);
+                break;
+
+            case 'f':
+                parsed->plik = fopen(optarg, "r");
+                if(parsed->plik == NULL)
+                {
+                    fprintf(stderr, "Błąd podczas otwierania pliku %s\n", optarg);
+                    return NULL;
+                }
+                break;
+
+            case 'c':
+                parsed->is_txt = 0;
+                break;
+
+            case 'h':
+                printf("Argumenty:\n\t-x <liczba naturalna> #liczba kolumn w labiryncie\n\t-y <liczba naturalna> #liczba wierszy w labiryncie\n\t-f <ścieżka do pliku z labiryntem>\nPrzykładowe wywołanie:\n\t./preprocessor -x 512 -y 512 -f maze-512x512.txt\n");
+                return HELP_FLAG;
+
+            case '?':
+                if(optopt == 'x' || optopt == 'y' || optopt == 'f')
+                    fprintf(stderr, "Opcja -%c wymaga argumentu!\n", optopt);
+                else if(isprint(optopt))
+                    fprintf(stderr, "Nieznana opcja: %c\n", optopt);
+                else
+                    fprintf(stderr, "Nieznany znak: %x\n", optopt);
+
+                return NULL;
+        }
+    }
+    
+    if(parsed->x == -1)
+    {
+        fprintf(stderr, "Brak wymaganej opcji: -x\n");
+        return NULL;
+    }
+    if(parsed->y == -1)
+    {
+        fprintf(stderr, "Brak wymaganej opcji: -y\n");
+        return NULL;
+    }
+    if(parsed->plik == NULL)
+    {
+        fprintf(stderr, "Brak wymaganej opcji: -f\n");
+    }
+    return parsed; 
+}
 
 int main(int argc, char** argv)
 {
-    if(argc != 4)
-    {
-        fprintf(stderr, "%s: Zła liczba argumentów (%d/3)\n", argv[0], argc-1);
+    args* parsed_arguments = parse_args(argc, argv);
+
+    if(parsed_arguments == NULL)
         return 1;
-    }
-    
-    FILE* f = fopen(argv[1], "r");
+    if(parsed_arguments == HELP_FLAG)
+        return 0;
 
-    if(f == NULL)
-    {
-        fprintf(stderr, "%s: Błąd podczas otwierania pliku: %s\n", argv[0], argv[1]);
-        return 1;
-    }
 
-    mazemap m = read_map(f, atoi(argv[2]), atoi(argv[3]));    
-
-    queue q = make_queue();       
-
-    node n = {.x = m.enx, .y = m.eny, .nr = 0};
-
-    vec v = make_vec();
-
-    edge edgeN = {.next = 0, .length = 0};
-    edge edgeE = {.next = 1, .length = 1};
-    edge edgeS = {.next = 0, .length = 1};
-    edge edgeW = {.next = 0, .length = 0};
-
-    big_node start = {.n = n, .nextE = edgeE,
-    .nextN = edgeN, .nextS = edgeS, .nextW = edgeW}; 
-
-    push_vec(&v, start);
-    node n1 = {.x = m.enx + 1, .y = m.eny, .nr = 1};
-    big_node bn1 = {.n = n1, .nextN = edgeN, .nextE = edgeN, .nextW = edgeS, .nextS = edgeN};
-    push_vec(&v, bn1);
-    push_queue(&q, n1);
-
-    while(!is_queue_empty(&q))
-    {
-        node current = pop_queue(&q);
-        int code;
-        int offset = 0;
-
-        while((code = is_node(N, current.x, current.y - offset, m)) == 0)
-            offset++;
-
-        switch(code)
-        {
-            case 1:
-                
-        }
-    }
 }
