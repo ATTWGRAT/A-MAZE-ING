@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include "map_reader.h"
 
 #define HELP_FLAG (void*) 0xffffffffffffffff
 
@@ -94,5 +95,22 @@ int main(int argc, char** argv)
     if(parsed_arguments == HELP_FLAG)
         return 0;
 
+    maze_map* map = read_uncompressed(parsed_arguments->x, parsed_arguments->y, parsed_arguments->plik);
+    
+    if(map == NULL)
+        return 1;
+
+    printf("Entrance: (%d, %d)\n", map->entrance.x, map->entrance.y);
+    printf("Exit: (%d, %d)\n", map->exit.x, map->exit.y);
+
+
+    for(int i = 0; i < map->y; i++)
+    {
+        for(int j = 0; j < map->x; j++)
+        {
+            printf("%c", map->maze[i][j]);
+        }
+        printf("\n");
+    }
 
 }
