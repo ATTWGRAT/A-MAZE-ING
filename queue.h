@@ -9,10 +9,10 @@ typedef struct sn{
 } snode;
 
 typedef struct q {
-  snode *array;
-  int size;
-  int first;
-  int last;
+    snode *array;
+    int size;
+    int first;
+    int last;
 } queue;
 
 queue make_queue();
