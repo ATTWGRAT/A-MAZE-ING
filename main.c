@@ -2,7 +2,7 @@
 #include "way_out.h"
 
 int main() {
-    
+    //tests    
     stack s = make_stack();
 
     linked_node n1 = {.nr = 1, .dir = E, .length = 3};
