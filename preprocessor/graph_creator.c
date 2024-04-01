@@ -214,3 +214,23 @@ int search_direction(int nr, graph* pgraph, directions dir, maze_map* pmap)
         return code;
     }
 }
+
+graph* graphize(maze_map * pmap)
+{
+    graph* pgraph = init_graph();
+
+    node first_node = init_node(pmap->entrance);
+
+    int first_number = push_graph(pgraph, first_node);
+
+    //Zrób kolejkę, wrzuć do niej first_number.
+    //Następnie w loopie kolejno zdejmuj element z kolejki,
+    //sprawdź wszystkie kierunki (używając search_direction) dla których edge ma .nr równy -1
+    //i jeśli search_direction zwróci liczbę większą od 0, to wrzuć
+    //ją na kolejkę. 
+    //Loop ma się kończyć jak kolejka jest pusta.
+    //Wtedy funkcja zwraca pgraph.
+
+    return pgraph;
+}
+
