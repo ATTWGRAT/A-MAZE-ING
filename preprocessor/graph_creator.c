@@ -50,14 +50,19 @@ int search_for_node(coords location, graph* pgraph)
 
 char is_node(coords location, directions dir, maze_map* pmap)
 {
-    char temp = pmap->maze[location.y][location.x];
+    char temp;
+
+    if(location.x >= pmap->x || location.y >= pmap->y || location.x < 0 || location.y < 0)
+        temp = 'X';
+    else
+        temp = pmap->maze[location.y][location.x];
 
     if(temp == 'V')
         return 2;
-    else if(temp == 'X')
-        return 4;
     else if(temp == 'K')
         return 5;
+    else if(temp == 'X')
+        return 4;
 
     char north_char = pmap->maze[location.y - 1][location.x];
     char south_char = pmap->maze[location.y + 1][location.x];
@@ -176,10 +181,11 @@ int search_direction(int nr, graph* pgraph, directions dir, maze_map* pmap)
                 backwards.next = nr;
                 backwards.length = counter;
 
-                if(!code)
+                if(!code){
                     pmap->maze[current.y][current.x]='V';
                     code = new_nr;
-                
+                }
+
                 break;
 
             case 0:
@@ -221,44 +227,44 @@ graph* graphize(maze_map * pmap)
 {
     graph* pgraph = init_graph();
 
-    node first_node = init_node(pmap->entrance);
+    node temp_node = init_node(pmap->entrance);
 
-    int first_number = push_graph(pgraph, first_node);
+    int return_code = push_graph(pgraph, temp_node);
 
     queue q = make_queue();
-    push_queue(&q,first_number);
-    while (is_queue_empty(&q)!=1){
-        int temp = pop_queue(&q);
-        node temp_node = pgraph->nodes[temp];
+
+    push_queue(&q, return_code);
+
+    int temp;
+    
+    while (is_queue_empty(&q) != 1){
+
+        temp = pop_queue(&q);
+
+        temp_node = pgraph->nodes[temp];
+
         if(temp_node.N.next == -1){
-            if(search_direction(temp,pgraph,N,pmap)>0){
-                push_queue(&q,search_direction(temp,pgraph,N,pmap));
+            if((return_code = search_direction(temp,pgraph,N,pmap)) > 0){
+                push_queue(&q, return_code);
             }
         }
         if(temp_node.E.next == -1){
-            if(search_direction(temp,pgraph,E,pmap)>0){
-                push_queue(&q,search_direction(temp,pgraph,E,pmap));
+            if((return_code = search_direction(temp,pgraph,E,pmap)) > 0){
+                push_queue(&q, return_code);
             }
         }
         if(temp_node.S.next == -1){
-            if(search_direction(temp,pgraph,S,pmap)>0){
-                push_queue(&q,search_direction(temp,pgraph,S,pmap));
+            if((return_code = search_direction(temp,pgraph,S,pmap)) > 0){
+                push_queue(&q, return_code);
             }
         }
         if(temp_node.W.next == -1){
-            if(search_direction(temp,pgraph,W,pmap)>0){
-                push_queue(&q,search_direction(temp,pgraph,W,pmap));
+            if((return_code = search_direction(temp,pgraph,W,pmap)) > 0){
+                push_queue(&q, return_code);
             }
         }
 
     }
-
-    //Następnie w loopie kolejno zdejmuj element z kolejki,
-    //sprawdź wszystkie kierunki (używając search_direction) dla których edge ma .nr równy -1
-    //i jeśli search_direction zwróci liczbę większą od 0, to wrzuć
-    //ją na kolejkę. 
-    //Loop ma się kończyć jak kolejka jest pusta.
-    //Wtedy funkcja zwraca pgraph.
 
     return pgraph;
 }

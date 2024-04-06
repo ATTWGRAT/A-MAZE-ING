@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include "map_reader.h"
+#include "graph_creator.h"
 
 #define HELP_FLAG (void*) 0xffffffffffffffff
 
@@ -103,14 +104,11 @@ int main(int argc, char** argv)
     printf("Entrance: (%d, %d)\n", map->entrance.x, map->entrance.y);
     printf("Exit: (%d, %d)\n", map->exit.x, map->exit.y);
 
+    graph* g = graphize(map);
 
-    for(int i = 0; i < map->y; i++)
+    for(int i = 0; i < g->length; i++)
     {
-        for(int j = 0; j < map->x; j++)
-        {
-            printf("%c", map->maze[i][j]);
-        }
-        printf("\n");
+        node cpy = g->nodes[i];
+        printf("(%d, %d)  |  %d ; %d ; %d ; %d\n", cpy.coords.x, cpy.coords.y, cpy.N.next, cpy.E.next, cpy.S.next, cpy.W.next);
     }
-
 }
