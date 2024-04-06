@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include "map_reader.h"
@@ -11,6 +12,7 @@ typedef struct _preprocessorargs{
     int x, y;
     FILE* plik;
     char is_txt;
+    char* name_ptr;
 } args;
 
 args* parse_args(int argc, char** argv)
@@ -20,6 +22,7 @@ args* parse_args(int argc, char** argv)
     parsed->x = -1;
     parsed->y = -1;
     parsed->plik = NULL;
+    parsed->name_ptr = NULL;
 
     char temp;
 
@@ -48,6 +51,7 @@ args* parse_args(int argc, char** argv)
                     fprintf(stderr, "Błąd podczas otwierania pliku %s\n", optarg);
                     return NULL;
                 }
+                parsed->name_ptr = optarg;
                 break;
 
             case 'c':
@@ -106,9 +110,15 @@ int main(int argc, char** argv)
 
     graph* g = graphize(map);
 
-    for(int i = 0; i < g->length; i++)
-    {
-        node cpy = g->nodes[i];
-        printf("(%d, %d)  |  %d ; %d ; %d ; %d\n", cpy.coords.x, cpy.coords.y, cpy.N.next, cpy.E.next, cpy.S.next, cpy.W.next);
-    }
+    char* new_name = malloc(strlen(parsed_arguments->name_ptr) + 6);
+    
+    strcpy(new_name, parsed_arguments->name_ptr);
+
+    strcat(new_name, ".pped");
+
+    FILE* out = fopen(new_name, "wb");
+
+    write_graph(g, out);
+
+    return 0;
 }

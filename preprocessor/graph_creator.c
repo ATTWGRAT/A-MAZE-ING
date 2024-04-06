@@ -269,3 +269,36 @@ graph* graphize(maze_map * pmap)
     return pgraph;
 }
 
+int write_graph(graph* pgraph, FILE* out)
+{
+    int buffer[9] = {pgraph->exit_index, pgraph->length, 0, 0, 0, 0, 0, 0};
+    buffer[8] = 0xFFFFFFFF;
+
+    node temp;
+
+    if(fwrite(buffer, 4, 9, out) != 9)
+        return -1;
+
+    for(int i = 0; i < pgraph->length; i++)
+    {
+        temp = pgraph->nodes[i];
+
+        buffer[0] = temp.N.next + 1;
+        buffer[1] = temp.N.length;
+
+        buffer[2] = temp.E.next + 1;
+        buffer[3] = temp.E.length;
+
+        buffer[4] = temp.S.next + 1;
+        buffer[5] = temp.S.length;
+
+        buffer[6] = temp.W.next + 1;
+        buffer[7] = temp.W.length;
+
+        if(fwrite(buffer, 4, 9, out) != 9)
+            return -1;
+    }
+
+    return 0;
+}
+
