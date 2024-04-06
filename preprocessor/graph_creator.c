@@ -1,4 +1,5 @@
 #include "graph_creator.h"
+#include "queue.h"
 
 graph* init_graph()
 {
@@ -176,6 +177,7 @@ int search_direction(int nr, graph* pgraph, directions dir, maze_map* pmap)
                 backwards.length = counter;
 
                 if(!code)
+                    pmap->maze[current.y][current.x]='V';
                     code = new_nr;
                 
                 break;
@@ -223,7 +225,34 @@ graph* graphize(maze_map * pmap)
 
     int first_number = push_graph(pgraph, first_node);
 
-    //Zrób kolejkę, wrzuć do niej first_number.
+    queue q = make_queue();
+    push_queue(&q,first_number);
+    while (is_queue_empty(&q)!=1){
+        int temp = pop_queue(&q);
+        node temp_node = pgraph->nodes[temp];
+        if(temp_node.N.next == -1){
+            if(search_direction(temp,pgraph,N,pmap)>0){
+                push_queue(&q,search_direction(temp,pgraph,N,pmap));
+            }
+        }
+        if(temp_node.E.next == -1){
+            if(search_direction(temp,pgraph,E,pmap)>0){
+                push_queue(&q,search_direction(temp,pgraph,E,pmap));
+            }
+        }
+        if(temp_node.S.next == -1){
+            if(search_direction(temp,pgraph,S,pmap)>0){
+                push_queue(&q,search_direction(temp,pgraph,S,pmap));
+            }
+        }
+        if(temp_node.W.next == -1){
+            if(search_direction(temp,pgraph,W,pmap)>0){
+                push_queue(&q,search_direction(temp,pgraph,W,pmap));
+            }
+        }
+
+    }
+
     //Następnie w loopie kolejno zdejmuj element z kolejki,
     //sprawdź wszystkie kierunki (używając search_direction) dla których edge ma .nr równy -1
     //i jeśli search_direction zwróci liczbę większą od 0, to wrzuć
