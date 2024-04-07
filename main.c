@@ -1,4 +1,8 @@
-int main() {
+#include "graph_file_reader.h"
+#include "maze_solver.h"
+#include "way_out.h"
+
+int main(int argc, char** argv) {
     //tests    
     /*stack s = make_stack();
 
@@ -53,4 +57,18 @@ int main() {
         printf("popped: (%d, %d)\n", popped.nr, popped.dj_length);
     }
     return 0;*/
+
+    graph_file* gf = open_processed_file(argv[1]);
+
+    dj_solve(gf);
+
+    route* r = find_route(gf);
+
+    if(r == NULL){
+        printf("Fuck\n");
+        return 1;
+    }
+
+    print_way_out(r);
+
 }

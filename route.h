@@ -20,7 +20,7 @@ typedef struct s {
 } route;
 
 int is_route_empty(route *r);
-route make_route();
+route* make_route();
 int push_route(route *proute, linked_node p);
 linked_node pop_route(route *proute);
 linked_node peek_route(route *proute);

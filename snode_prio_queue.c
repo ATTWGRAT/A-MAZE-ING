@@ -1,4 +1,4 @@
-#include "queue.h"
+#include "snode_prio_queue.h"
 
 queue make_queue() 
 {

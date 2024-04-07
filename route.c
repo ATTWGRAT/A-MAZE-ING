@@ -2,11 +2,11 @@
 
 int is_route_empty(route *r) { return r->last == -1; }
 
-route make_route() {
-  route s;
-  s.size = 10;
-  s.last = -1;
-  s.array = malloc(10 * sizeof *s.array);
+route* make_route() {
+  route* s = malloc(sizeof *s);
+  s->size = 10;
+  s->last = -1;
+  s->array = malloc(10 * sizeof *s->array);
   return s;
 }
 
