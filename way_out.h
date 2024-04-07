@@ -5,7 +5,8 @@
 #ifndef A_MAZE_ING_WAY_OUT_H
 #define A_MAZE_ING_WAY_OUT_H
 #include <stdio.h>
-#include "stack.h"
-void print_way_out(stack *s);
-
+#include "route.h"
+#include "graph_file_reader.h"
+void print_way_out(route *s);
+route* find_route(graph_file* gf);
 #endif //A_MAZE_ING_WAY_OUT_H

@@ -271,7 +271,7 @@ graph* graphize(maze_map * pmap)
 
 int write_graph(graph* pgraph, FILE* out)
 {
-    int buffer[9] = {pgraph->exit_index, pgraph->length, 0, 0, 0, 0, 0, 0};
+    int buffer[9] = {pgraph->exit_index+1, pgraph->length, 0, 0, 0, 0, 0, 0};
     buffer[8] = 0xFFFFFFFF;
 
     node temp;

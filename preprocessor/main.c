@@ -105,9 +105,6 @@ int main(int argc, char** argv)
     if(map == NULL)
         return 1;
 
-    printf("Entrance: (%d, %d)\n", map->entrance.x, map->entrance.y);
-    printf("Exit: (%d, %d)\n", map->exit.x, map->exit.y);
-
     graph* g = graphize(map);
 
     char* new_name = malloc(strlen(parsed_arguments->name_ptr) + 6);
