@@ -68,9 +68,27 @@ int push_queue(queue *queue, snode p)
         queue->last++;
     }
 
+    int final_index = queue->last;
+    int check_index;
 
+    while(final_index != queue->first)
+    {
+        if(final_index == 0)
+            check_index = queue->size - 1;
+        else
+            check_index = final_index - 1;
 
-    queue->array[queue->last] = p;
+        if(queue->array[check_index].dj_length > p.dj_length)
+        {
+            queue->array[final_index] = queue->array[check_index];
+            final_index = check_index;
+        }
+        else
+            break;
+
+    }
+
+    queue->array[final_index] = p;
     return 0;
 }
 

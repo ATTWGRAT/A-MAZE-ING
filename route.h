@@ -17,12 +17,12 @@ typedef struct s {
   linked_node *array;
   int size;
   int last;
-} stack;
+} route;
 
-int is_stack_empty(stack *s);
-stack make_stack();
-int push_stack(stack *stack, linked_node p);
-linked_node pop_stack(stack *stack);
-linked_node peek_stack(stack *stack);
+int is_route_empty(route *r);
+route make_route();
+int push_route(route *proute, linked_node p);
+linked_node pop_route(route *proute);
+linked_node peek_route(route *proute);
 
 #endif // A_MAZE_ING_STACK_H

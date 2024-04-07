@@ -18,16 +18,18 @@ typedef struct n {
     edge nextE;
     edge nextS;
     edge nextW;
-    int dj_length;
+    unsigned int dj_length;
 } node;
 
 typedef struct f{
     FILE* file;
     int exit_node;
     int curr_node;
-} file_line;
+    int nodes_amount;
+} graph_file;
 
-node read_single_node(int nr, file_line* f);
-file_line* open_processed_file(char* name);
-int write_dj_length(int nr, int length, file_line* f);
+node read_single_node(int nr, graph_file* f);
+graph_file* open_processed_file(char* name);
+int write_dj_length(int nr, int length, graph_file* f);
+int read_dj_length(int nr, graph_file* gf);
 #endif
