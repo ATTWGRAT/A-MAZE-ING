@@ -4,20 +4,26 @@
 #include <stdlib.h>
 
 enum direction{
-    N, E, S, W
-};
+    N = 0,
+    E = 1,
+    S = 2,
+    W = 3
+} __attribute__ ((__packed__));
 
-typedef struct ln {
-    int nr;
+struct ln {
     enum direction dir;
-    int length;
-} linked_node;
+    short length;
+} __attribute__ ((__packed__));
 
-typedef struct s {
+typedef struct ln linked_node;
+
+struct s {
   linked_node *array;
   int size;
   int last;
-} route;
+} __attribute__ ((__packed__));
+
+typedef struct s route;
 
 int is_route_empty(route *r);
 route* make_route();

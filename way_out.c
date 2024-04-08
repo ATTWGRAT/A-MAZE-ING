@@ -77,28 +77,26 @@ route* find_route(graph_file* gf)
 
         if(temp_node.nextN.next != 0 && (temp_len = read_dj_length(temp_node.nextN.next, gf)) == curr_len - temp_node.nextN.length)
         {
-            linked_node ln = {.length = temp_node.nextN.length, .dir = S, .nr = temp_node.nextN.next};
+            linked_node ln = {.length = temp_node.nextN.length, .dir = S};
 
             push_route(r, ln);
 
-            printf("%d -> %d  |  (%d)\n", ln.nr, temp_node.nr, ln.length);
             curr_len = temp_len;
 
-            temp_node = read_single_node(ln.nr, gf);
+            temp_node = read_single_node(temp_node.nextN.next, gf);
 
             continue;
         }
 
         if(temp_node.nextE.next != 0 && (temp_len = read_dj_length(temp_node.nextE.next, gf)) == curr_len - temp_node.nextE.length)
         {
-            linked_node ln = {.length = temp_node.nextE.length, .dir = W, .nr = temp_node.nextE.next};
+            linked_node ln = {.length = temp_node.nextE.length, .dir = W};
 
             push_route(r, ln);
 
-            printf("%d -> %d  |  (%d)\n", ln.nr, temp_node.nr, ln.length);
             curr_len = temp_len;
 
-            temp_node = read_single_node(ln.nr, gf);
+            temp_node = read_single_node(temp_node.nextE.next, gf);
 
             continue;
         }
@@ -106,14 +104,13 @@ route* find_route(graph_file* gf)
 
         if(temp_node.nextS.next != 0 && (temp_len = read_dj_length(temp_node.nextS.next, gf)) == curr_len - temp_node.nextS.length)
         {
-            linked_node ln = {.length = temp_node.nextS.length, .dir = N, .nr = temp_node.nextS.next};
+            linked_node ln = {.length = temp_node.nextS.length, .dir = N};
 
             push_route(r, ln);
 
-            printf("%d -> %d  |  (%d)\n", ln.nr, temp_node.nr, ln.length);
             curr_len = temp_len;
 
-            temp_node = read_single_node(ln.nr, gf);
+            temp_node = read_single_node(temp_node.nextS.next, gf);
 
             continue;
         }
@@ -121,14 +118,13 @@ route* find_route(graph_file* gf)
 
         if(temp_node.nextW.next != 0 && (temp_len = read_dj_length(temp_node.nextW.next, gf)) == curr_len - temp_node.nextW.length)
         {
-            linked_node ln = {.length = temp_node.nextW.length, .dir = E, .nr = temp_node.nextW.next};
+            linked_node ln = {.length = temp_node.nextW.length, .dir = E};
 
             push_route(r, ln);
 
-            printf("%d -> %d  |  (%d)\n", ln.nr, temp_node.nr, ln.length);
             curr_len = temp_len;
 
-            temp_node = read_single_node(ln.nr, gf);
+            temp_node = read_single_node(temp_node.nextW.next, gf);
 
             continue;
         }

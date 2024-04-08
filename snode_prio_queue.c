@@ -1,16 +1,16 @@
 #include "snode_prio_queue.h"
-
+#include <stdio.h>
 queue make_queue() 
 {
     queue q;
-    q.size = 10;
+    q.size = 200;
     q.last = -1;
     q.first = -1;
-    q.array = malloc(10 * sizeof *q.array);
+    q.array = malloc(200 * sizeof *q.array);
     return q;
 }
 
-int push_queue(queue *queue, snode p) 
+char push_queue(queue *queue, snode p) 
 {
     if (queue->first == -1) 
     {
@@ -24,12 +24,12 @@ int push_queue(queue *queue, snode p)
         if (queue->first == 0) 
         {
             queue->array =
-                realloc(queue->array, queue->size * 2 * sizeof *(queue->array));
+                realloc(queue->array, (queue->size + 200)   * sizeof *(queue->array));
             if (queue->array == NULL) 
             {
                 return -1;
             }
-            queue->size *= 2;
+            queue->size += 200;
             queue->last++;
         } 
         else 
@@ -40,7 +40,7 @@ int push_queue(queue *queue, snode p)
     } 
     else if (queue->first - 1 == queue->last) 
     {
-        snode *temp = malloc(queue->size * 2 * sizeof *(queue->array));
+        snode *temp = malloc((queue->size + 200) * sizeof *(queue->array));
 
         if (temp == NULL) 
         {
@@ -61,7 +61,7 @@ int push_queue(queue *queue, snode p)
         queue->array = temp;
         queue->first = 0;
         queue->last = queue->size;
-        queue->size *= 2;
+        queue->size += 200;
     } 
     else 
     {
@@ -109,7 +109,7 @@ snode pop_queue(queue *queue)
     return queue->array[queue->first++];
 }
 
-int is_queue_empty(queue *queue) 
+char is_queue_empty(queue *queue) 
 {
     if (queue->first == -1) {
         return 1;

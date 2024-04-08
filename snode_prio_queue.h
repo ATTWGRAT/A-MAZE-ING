@@ -4,20 +4,20 @@
 #include <stdlib.h>
 
 typedef struct sn{
-    int nr;
-    int dj_length;
+    unsigned int nr;
+    unsigned int dj_length;
 } snode;
 
 typedef struct q {
     snode *array;
-    int size;
-    int first;
-    int last;
+    unsigned int size;
+    unsigned int first;
+    unsigned int last;
 } queue;
 
 queue make_queue();
 snode peek_queue(queue *queue);
-int push_queue(queue *queue, snode p);
+char push_queue(queue *queue, snode p);
 snode pop_queue(queue *queue);
-int is_queue_empty(queue *queue); 
+char is_queue_empty(queue *queue); 
 #endif
