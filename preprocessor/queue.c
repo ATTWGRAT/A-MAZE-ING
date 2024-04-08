@@ -1,12 +1,12 @@
 #include "queue.h"
 
-queue make_queue() 
+queue* make_queue() 
 {
-    queue q;
-    q.size = 10;
-    q.last = -1;
-    q.first = -1;
-    q.array = malloc(10 * sizeof *q.array);
+    queue* q = malloc(sizeof *q);
+    q->size = 10;
+    q->last = -1;
+    q->first = -1;
+    q->array = malloc(10 * sizeof *q->array);
     return q;
 }
 

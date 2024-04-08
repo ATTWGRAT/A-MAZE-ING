@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 
-
 typedef struct q {
     int *array;
     int size;
@@ -11,7 +10,7 @@ typedef struct q {
     int last;
 } queue;
 
-queue make_queue();
+queue* make_queue();
 int peek_queue(queue *queue);
 int push_queue(queue *queue, int p);
 int pop_queue(queue *queue);

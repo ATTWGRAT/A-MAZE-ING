@@ -4,10 +4,20 @@
 graph* init_graph()
 {
     graph* pgraph = malloc(sizeof *pgraph);
+
+    if(pgraph == NULL)
+        return NULL;
+
     pgraph->length = 0;
     pgraph->size = 8;
     pgraph->exit_index = -1;
     pgraph->nodes = malloc(8 * sizeof *(pgraph->nodes)); 
+
+    if(pgraph->nodes == NULL)
+    {
+        free(pgraph);
+        return NULL;
+    }
 
     return pgraph;
 }
@@ -147,10 +157,13 @@ int search_direction(int nr, graph* pgraph, directions dir, maze_map* pmap)
         switch(is_node(current, dir, pmap))
         {
             case 4:
-                return -4;
+                return IGNORE_NODE;
 
             case 2:
                 new_nr = search_for_node(current, pgraph);
+                
+                if(new_nr == -1)
+                    return FALSE_VISITED_ERROR;
 
                 forwards.next = new_nr;
                 forwards.length = counter;
@@ -158,22 +171,21 @@ int search_direction(int nr, graph* pgraph, directions dir, maze_map* pmap)
                 backwards.next = nr;
                 backwards.length = counter;
 
-                code = -2; 
+                code = IGNORE_NODE; 
                 
                 break;
 
             case 5:
                 pgraph->exit_index = pgraph->length;
-                code = -5;
-
             case 3:
-                if(!code)
-                    code = -3;
-
+                code = IGNORE_NODE;
             case 1:
                 new_node = init_node(current); 
                 
                 new_nr = push_graph(pgraph, new_node);
+
+                if(new_nr == -1)
+                    return MEMORY_REALLOCATION_ERROR;
                 
                 forwards.next = new_nr;
                 forwards.length = counter;
@@ -227,46 +239,105 @@ graph* graphize(maze_map * pmap)
 {
     graph* pgraph = init_graph();
 
+    if(pgraph == NULL)
+    {
+        fprintf(stderr, "Błąd podczas tworzenia grafu\n");
+        return NULL;
+    }
+
     node temp_node = init_node(pmap->entrance);
 
     int return_code = push_graph(pgraph, temp_node);
 
-    queue q = make_queue();
+    if(return_code == -1)
+    {
+        fprintf(stderr, "Błąd podczas realokacji pamięci na graf\n");
+        free(pgraph->nodes);
+        free(pgraph);
+        return NULL;
+    }
 
-    push_queue(&q, return_code);
+    queue* q = make_queue();
+
+    if(push_queue(q, return_code) == -1)
+    {
+        return_code = MEMORY_REALLOCATION_ERROR;
+        goto freeall;
+    }
 
     int temp;
     
-    while (is_queue_empty(&q) != 1){
+    while (is_queue_empty(q) != 1){
 
-        temp = pop_queue(&q);
+        temp = pop_queue(q);
 
         temp_node = pgraph->nodes[temp];
 
         if(temp_node.N.next == -1){
             if((return_code = search_direction(temp,pgraph,N,pmap)) > 0){
-                push_queue(&q, return_code);
-            }
+                if(push_queue(q, return_code) == -1)
+                {
+                    return_code = MEMORY_REALLOCATION_ERROR;
+                    goto messg;
+                }
+            } else goto messg;
         }
+
         if(temp_node.E.next == -1){
             if((return_code = search_direction(temp,pgraph,E,pmap)) > 0){
-                push_queue(&q, return_code);
-            }
+                if(push_queue(q, return_code) == -1)
+                {
+                    return_code = MEMORY_REALLOCATION_ERROR;
+                    goto messg;
+                }
+            } else goto messg;
         }
+
         if(temp_node.S.next == -1){
             if((return_code = search_direction(temp,pgraph,S,pmap)) > 0){
-                push_queue(&q, return_code);
-            }
+                if(push_queue(q, return_code) == -1)
+                {
+                    return_code = MEMORY_REALLOCATION_ERROR;
+                    goto messg;
+                }
+            } else goto messg;
         }
+
         if(temp_node.W.next == -1){
             if((return_code = search_direction(temp,pgraph,W,pmap)) > 0){
-                push_queue(&q, return_code);
-            }
+                if(push_queue(q, return_code) == -1)
+                {
+                    return_code = MEMORY_REALLOCATION_ERROR;
+                    goto messg;
+                }
+            } else goto messg;
         }
 
     }
 
     return pgraph;
+
+
+
+messg:
+    switch(return_code){
+        case -2:
+            fprintf(stderr, "GRATULACJE!!! Odkryłeś sekretny błąd. Jesteś z siebie dumny?\n");
+            break;
+        case -3:
+            fprintf(stderr, "Błąd podczas realokacji pamięci\n");
+
+    }
+
+
+freeall:
+    free(pgraph->nodes);
+    free(pgraph);
+    free(q->array);
+    free(q);
+    return NULL;
+
+
 }
 
 int write_graph(graph* pgraph, FILE* out)

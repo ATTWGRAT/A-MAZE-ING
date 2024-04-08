@@ -107,15 +107,34 @@ int main(int argc, char** argv)
 
     graph* g = graphize(map);
 
+    if(g == NULL)
+        return 1;
+
     char* new_name = malloc(strlen(parsed_arguments->name_ptr) + 6);
     
+    if(new_name == NULL)
+    {
+        fprintf(stderr, "Błąd podczas alokowania pamięci\n");
+        return 1;
+    }
+
     strcpy(new_name, parsed_arguments->name_ptr);
 
     strcat(new_name, ".pped");
 
     FILE* out = fopen(new_name, "wb");
 
-    write_graph(g, out);
+    if(out == NULL)
+    {
+        fprintf(stderr, "Błąd podczas tworzenia pliku o nazwie %s\n", new_name);
+        return 1;
+    }
+
+    if(write_graph(g, out) == -1)
+    {
+        fprintf(stderr, "Błąd podczas wypisywania do pliku\n");
+        return 1;
+    }
 
     return 0;
 }
