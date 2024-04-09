@@ -1,6 +1,30 @@
 #include "map_reader.h"
 #include "map_struct.h"
 
+struct binary_file_header{
+    int File_ID;
+    char ESC;
+    short columns;
+    short lines;
+    short entryX;
+    short entryY;
+    short exitX;
+    short exitY;
+    char reserved[12];
+    int counter;
+    int solution_offset;
+    char separator;
+    char wall;
+    char path;
+}__attribute__((packed));
+
+struct code_word{
+    char separator;
+    char value;
+    unsigned char count;
+}__attribute__((packed));
+
+
 /* Helper functions */
 int check_first_or_last_line(int x, int y, int line_nr, char* buffer, maze_map* pmap)
 {
@@ -155,6 +179,9 @@ maze_map* read_uncompressed(int x, int y, FILE* file)
         fprintf(stderr, "Błąd podczas alokowania pamięci na mapę\n");
         return NULL;
     }
+
+    pmap->wall = 'X';
+    pmap->path = ' ';
     
     //Początkowe wartości dla wejścia i wyjścia
     coords bad_cords = {.x = -1, .y = -1};
@@ -247,8 +274,143 @@ maze_map* read_uncompressed(int x, int y, FILE* file)
     if(check_first_or_last_line(x, y, 2*y, buffer, pmap) == -1)
         return NULL;
 
+    free(buffer);
+
     return pmap;
 
 }
 
+maze_map* read_compressed(FILE* f)
+{
+    struct binary_file_header bfh;
 
+    if(fread(&bfh, 40, 1, f) != 1)
+    {
+        fprintf(stderr, "Błąd podczas wczytywania nagłówka pliku\n");
+        return NULL;
+    };
+
+    if(bfh.File_ID != 0x52524243 || bfh.ESC != 0x1B)
+    {
+        fprintf(stderr, "Błędny nagłówek pliku!\n");
+        return NULL;
+    }
+
+    if(bfh.exitX < 1 || bfh.exitX > bfh.columns || bfh.exitY < 1 || bfh.exitY > bfh.lines)
+    {
+        fprintf(stderr, "Błędna lokalizacja wyjścia: (%d, %d)\n", bfh.exitX, bfh.exitY);
+        return NULL;
+    }
+
+    if(bfh.entryX < 1 || bfh.entryX > bfh.columns || bfh.entryY < 1 || bfh.entryY > bfh.lines)
+    {
+        fprintf(stderr, "Błędna lokalizacja wejścia: (%d, %d)\n", bfh.entryX, bfh.entryY);
+        return NULL;
+    }
+
+    maze_map* pmap = malloc(sizeof *pmap);
+
+    if(pmap == NULL || (pmap->maze = malloc(bfh.lines * sizeof *pmap->maze)) == NULL)
+    {
+        fprintf(stderr, "Błąd podczas alokowania pamięci\n");
+        return NULL;
+    }
+
+    pmap->path = bfh.path;
+    pmap->wall = bfh.wall;
+
+    for(int i = 0; i < bfh.lines; i++)
+    {
+        pmap->maze[i] = malloc(bfh.columns);
+
+        if(pmap->maze[i] == NULL)
+        {
+            for(int j = 0; j < i; j++)
+                free(pmap->maze[j]);
+
+            free(pmap->maze);
+            free(pmap);
+
+            fprintf(stderr, "Błąd podczas alokowania pamięci\n");
+            return NULL;
+        }
+    }
+
+    struct code_word* super_buffer = malloc(bfh.counter * sizeof * super_buffer);
+
+    if(super_buffer == NULL)
+    {
+        fprintf(stderr, "Błąd podczas alokowania pamięci\n");
+        free_maze_map(pmap);
+        return NULL;
+    }
+
+    if(fread(super_buffer, sizeof *super_buffer, bfh.counter, f) != bfh.counter)
+    {
+        fprintf(stderr, "Błąd podczas wczytywania słów kodowych\n");
+        free_maze_map(pmap);
+        free(super_buffer);
+        return NULL;
+    }
+
+    int curr_column = 0;
+    int curr_line = 0;
+
+    struct code_word current;
+
+    for(int i = 0; i < bfh.counter; i++)
+    {
+        current = super_buffer[i];
+
+        if(current.separator != bfh.separator || (current.value != bfh.path && current.value != bfh.wall))
+        {
+            fprintf(stderr, "Błąd podczas przetwarzania słów kodowych - słowo %d - błędny znak\n", i+1);
+            free_maze_map(pmap);
+            free(super_buffer);
+            return NULL;
+        }
+
+        for(int j = 0; j <= current.count; j++)
+        {
+            pmap->maze[curr_line][curr_column++] = current.value;
+
+            if(curr_column == bfh.columns)
+            {
+                curr_line++;
+                curr_column = 0;
+
+                if(curr_line == bfh.lines && (j < current.count || i+1 < bfh.counter))
+                {
+                    fprintf(stderr, "Błąd podczas przetwarzania słów kodowych. Liczba wczytanych znaków > Pojemność labiryntu!\n");
+                    free_maze_map(pmap);
+                    free(super_buffer);
+                    return NULL;
+                } 
+            }
+        }
+    }
+
+    if(curr_line != bfh.lines)
+    {
+        fprintf(stderr, "Błąd podczas wczytywania. Liczba wczytanych znaków < Pojemność labiryntu!\n");
+        free_maze_map(pmap);
+        free(super_buffer);
+        return NULL;
+    }
+
+    pmap->maze[bfh.entryY - 1][bfh.entryX - 1] = 'P';
+    pmap->maze[bfh.exitY - 1][bfh.exitX - 1] = 'K';
+
+    coords entry = {.x = bfh.entryX - 1, .y = bfh.entryY - 1};
+    coords exit = {.x = bfh.exitX - 1, .y = bfh.exitY - 1};
+
+    pmap->entrance = entry;
+    pmap->exit = exit;
+
+    pmap->x = bfh.columns;
+    pmap->y = bfh.lines;
+
+    free(super_buffer);
+
+    return pmap;
+}

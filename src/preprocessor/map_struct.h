@@ -11,6 +11,7 @@ typedef struct _preprocessor_map{
     char** maze;
     int x, y;
     coords entrance, exit;
+    char wall, path;
 }maze_map;
 
 void free_maze_map(maze_map*);

@@ -47,13 +47,6 @@ args* parse_args(int argc, char** argv)
                 break;
 
             case 'f':
-                parsed->plik = fopen(optarg, "r");
-                if(parsed->plik == NULL)
-                {
-                    fprintf(stderr, "Błąd podczas otwierania pliku %s\n", optarg);
-                    free(parsed);
-                    return NULL;
-                }
                 parsed->name_ptr = optarg;
                 break;
 
@@ -78,24 +71,32 @@ args* parse_args(int argc, char** argv)
         }
     }
     
-    if(parsed->x == -1)
+    if(parsed->is_txt && parsed->x == -1)
     {
         fprintf(stderr, "Brak wymaganej opcji: -x\n");
         free(parsed);
         return NULL;
     }
-    if(parsed->y == -1)
+
+    if(parsed->is_txt && parsed->y == -1)
     {
         fprintf(stderr, "Brak wymaganej opcji: -y\n");
         free(parsed);
         return NULL;
     }
-    if(parsed->plik == NULL)
+
+    if(parsed->name_ptr == NULL)
     {
         fprintf(stderr, "Brak wymaganej opcji: -f\n");
         free(parsed);
         return NULL;
     }
+
+    if(parsed->is_txt)
+        parsed->plik = fopen(parsed->name_ptr, "r");
+    else
+        parsed->plik = fopen(parsed->name_ptr, "rb");
+
     return parsed; 
 }
 
@@ -108,7 +109,14 @@ int main(int argc, char** argv)
     if(parsed_arguments == HELP_FLAG)
         return 0;
 
-    maze_map* map = read_uncompressed(parsed_arguments->x, parsed_arguments->y, parsed_arguments->plik);
+    maze_map* map;
+    
+    if(parsed_arguments->is_txt)
+         map = read_uncompressed(parsed_arguments->x, parsed_arguments->y, parsed_arguments->plik);
+    else
+         map = read_compressed(parsed_arguments->plik);
+
+    FILE* t = fopen("test", "w");
 
     fclose(parsed_arguments->plik);
     

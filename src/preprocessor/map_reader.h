@@ -7,6 +7,6 @@
 
 maze_map* read_uncompressed(int, int, FILE*);
 
-maze_map* read_compressed(int, int, FILE*);
+maze_map* read_compressed(FILE*);
 
 #endif  

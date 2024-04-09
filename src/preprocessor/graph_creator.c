@@ -65,7 +65,7 @@ char is_node(coords location, directions dir, maze_map* pmap)
 
     //Sprawdza czy nie wychodzimy poza mapę
     if(location.x >= pmap->x || location.y >= pmap->y || location.x < 0 || location.y < 0)
-        temp = 'X';
+        temp = pmap->wall;
     else
         temp = pmap->maze[location.y][location.x];
 
@@ -73,7 +73,7 @@ char is_node(coords location, directions dir, maze_map* pmap)
         return VISITED;
     else if(temp == 'K')
         return EXIT;
-    else if(temp == 'X')
+    else if(temp == pmap->wall)
         return WALL;
 
     char north_char = pmap->maze[location.y - 1][location.x];
@@ -84,37 +84,37 @@ char is_node(coords location, directions dir, maze_map* pmap)
     switch(dir)
     {
         case N:
-            if(east_char != 'X' || west_char != 'X')
+            if(east_char != pmap->wall || west_char != pmap->wall)
                 return INTERSECTION;
             
-            if(north_char == 'X')
+            if(north_char == pmap->wall)
                 return DEAD_END;
             
             return STRAIGHT ;
 
         case E:
-            if(south_char != 'X' || north_char != 'X')
+            if(south_char != pmap->wall || north_char != pmap->wall)
                 return INTERSECTION;
             
-            if(east_char == 'X')
+            if(east_char == pmap->wall)
                 return DEAD_END;
             
             return STRAIGHT;
 
         case S:
-            if(west_char != 'X' || east_char != 'X')
+            if(west_char != pmap->wall || east_char != pmap->wall)
                 return INTERSECTION;
             
-            if(south_char == 'X')
+            if(south_char == pmap->wall)
                 return DEAD_END;
             
             return STRAIGHT;
 
         case W:
-            if(north_char != 'X' || south_char != 'X')
+            if(north_char != pmap->wall || south_char != pmap->wall)
                 return INTERSECTION;
             
-            if(west_char == 'X')
+            if(west_char == pmap->wall)
                 return DEAD_END;
             
             return STRAIGHT;
