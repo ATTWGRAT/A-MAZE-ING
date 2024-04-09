@@ -31,6 +31,7 @@ args* parse_args(int argc, char** argv)
             case 'x':
                 if(atoi(optarg) < 2 || (atoi(optarg) > 1024)){
                     fprintf(stderr, "Podana wartość nie jest liczbą z przedziału <2; 1024>: -%c %s\n", temp, optarg);
+                    free(parsed);
                     return NULL;
                 }
                 parsed->x = atoi(optarg);
@@ -39,6 +40,7 @@ args* parse_args(int argc, char** argv)
             case 'y':
                 if(atoi(optarg) < 2 || (atoi(optarg) > 1024)){
                     fprintf(stderr, "Podana wartość nie jest liczbą z przedziału <2; 1024>: -%c %s\n", temp, optarg);
+                    free(parsed);
                     return NULL;
                 }
                 parsed->y = atoi(optarg);
@@ -49,6 +51,7 @@ args* parse_args(int argc, char** argv)
                 if(parsed->plik == NULL)
                 {
                     fprintf(stderr, "Błąd podczas otwierania pliku %s\n", optarg);
+                    free(parsed);
                     return NULL;
                 }
                 parsed->name_ptr = optarg;
@@ -70,6 +73,7 @@ args* parse_args(int argc, char** argv)
                 else
                     fprintf(stderr, "Nieznany znak: %x\n", optopt);
 
+                free(parsed);
                 return NULL;
         }
     }
@@ -77,16 +81,20 @@ args* parse_args(int argc, char** argv)
     if(parsed->x == -1)
     {
         fprintf(stderr, "Brak wymaganej opcji: -x\n");
+        free(parsed);
         return NULL;
     }
     if(parsed->y == -1)
     {
         fprintf(stderr, "Brak wymaganej opcji: -y\n");
+        free(parsed);
         return NULL;
     }
     if(parsed->plik == NULL)
     {
         fprintf(stderr, "Brak wymaganej opcji: -f\n");
+        free(parsed);
+        return NULL;
     }
     return parsed; 
 }
@@ -101,20 +109,32 @@ int main(int argc, char** argv)
         return 0;
 
     maze_map* map = read_uncompressed(parsed_arguments->x, parsed_arguments->y, parsed_arguments->plik);
+
+    fclose(parsed_arguments->plik);
     
     if(map == NULL)
+    {
+        free(parsed_arguments);
         return 1;
+    }
 
     graph* g = graphize(map);
 
+    free(map);
+
     if(g == NULL)
+    {
+        free(parsed_arguments);
         return 1;
+    }
 
     char* new_name = malloc(strlen(parsed_arguments->name_ptr) + 6);
     
     if(new_name == NULL)
     {
         fprintf(stderr, "Błąd podczas alokowania pamięci\n");
+        free(parsed_arguments);
+        free(g);
         return 1;
     }
 
@@ -126,15 +146,26 @@ int main(int argc, char** argv)
 
     if(out == NULL)
     {
+        free(g);
+        free(parsed_arguments);
         fprintf(stderr, "Błąd podczas tworzenia pliku o nazwie %s\n", new_name);
         return 1;
     }
 
     if(write_graph(g, out) == -1)
     {
+        free(g);
+        free(parsed_arguments);
+        fclose(out);
         fprintf(stderr, "Błąd podczas wypisywania do pliku\n");
         return 1;
     }
+
+    fclose(out);
+    free(g);
+    free(parsed_arguments);
+
+    printf("Wypisano graf do pliku %s\n", new_name);
 
     return 0;
 }

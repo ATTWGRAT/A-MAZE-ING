@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "map_struct.h"
 
+#define STRAIGHT 0
 #define INTERSECTION 1
 #define VISITED 2
 #define DEAD_END 3

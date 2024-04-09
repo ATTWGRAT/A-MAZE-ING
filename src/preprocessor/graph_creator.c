@@ -49,6 +49,7 @@ int push_graph(graph* pgraph, node new_node)
 
 int search_for_node(coords location, graph* pgraph)
 {
+    //Sprawdza wszystkie węzły w grafie w poszukiwaniu tego o określonych koordynatach
     int ret = -1;
     
     for(int i = 0; i < pgraph->length; i++)
@@ -62,17 +63,18 @@ char is_node(coords location, directions dir, maze_map* pmap)
 {
     char temp;
 
+    //Sprawdza czy nie wychodzimy poza mapę
     if(location.x >= pmap->x || location.y >= pmap->y || location.x < 0 || location.y < 0)
         temp = 'X';
     else
         temp = pmap->maze[location.y][location.x];
 
     if(temp == 'V')
-        return 2;
+        return VISITED;
     else if(temp == 'K')
-        return 5;
+        return EXIT;
     else if(temp == 'X')
-        return 4;
+        return WALL;
 
     char north_char = pmap->maze[location.y - 1][location.x];
     char south_char = pmap->maze[location.y + 1][location.x];
@@ -83,39 +85,39 @@ char is_node(coords location, directions dir, maze_map* pmap)
     {
         case N:
             if(east_char != 'X' || west_char != 'X')
-                return 1;
+                return INTERSECTION;
             
             if(north_char == 'X')
-                return 3;
+                return DEAD_END;
             
-            return 0;
+            return STRAIGHT ;
 
         case E:
             if(south_char != 'X' || north_char != 'X')
-                return 1;
+                return INTERSECTION;
             
             if(east_char == 'X')
-                return 3;
+                return DEAD_END;
             
-            return 0;
+            return STRAIGHT;
 
         case S:
             if(west_char != 'X' || east_char != 'X')
-                return 1;
+                return INTERSECTION;
             
             if(south_char == 'X')
-                return 3;
+                return DEAD_END;
             
-            return 0;
+            return STRAIGHT;
 
         case W:
             if(north_char != 'X' || south_char != 'X')
-                return 1;
+                return INTERSECTION;
             
             if(west_char == 'X')
-                return 3;
+                return DEAD_END;
             
-            return 0;
+            return STRAIGHT;
     }
 
 }
@@ -133,6 +135,9 @@ int search_direction(int nr, graph* pgraph, directions dir, maze_map* pmap)
 
     while(1)
     {
+        //Następna iteracja = droga dłuższa o 1
+        //Loop kończy się kiedy napotkamy ścianę lub węzeł.
+
         counter++;
 
         switch(dir)
@@ -156,10 +161,10 @@ int search_direction(int nr, graph* pgraph, directions dir, maze_map* pmap)
 
         switch(is_node(current, dir, pmap))
         {
-            case 4:
+            case WALL:
                 return IGNORE_NODE;
 
-            case 2:
+            case VISITED:
                 new_nr = search_for_node(current, pgraph);
                 
                 if(new_nr == -1)
@@ -175,11 +180,11 @@ int search_direction(int nr, graph* pgraph, directions dir, maze_map* pmap)
                 
                 break;
 
-            case 5:
+            case EXIT:
                 pgraph->exit_index = pgraph->length;
-            case 3:
+            case DEAD_END:
                 code = IGNORE_NODE;
-            case 1:
+            case INTERSECTION:
                 new_node = init_node(current); 
                 
                 new_nr = push_graph(pgraph, new_node);
@@ -200,12 +205,12 @@ int search_direction(int nr, graph* pgraph, directions dir, maze_map* pmap)
 
                 break;
 
-            case 0:
+            case STRAIGHT:
                 break;
 
         }
 
-        if(!code)
+        if(code == STRAIGHT)
             continue;
 
         switch(dir)
@@ -245,6 +250,8 @@ graph* graphize(maze_map * pmap)
         return NULL;
     }
 
+    //Tworzymy początkowy węzeł i dodajemy do grafu
+
     node temp_node = init_node(pmap->entrance);
 
     int return_code = push_graph(pgraph, temp_node);
@@ -262,7 +269,7 @@ graph* graphize(maze_map * pmap)
     if(push_queue(q, return_code) == -1)
     {
         return_code = MEMORY_REALLOCATION_ERROR;
-        goto freeall;
+        goto messg;
     }
 
     int temp;
@@ -273,44 +280,60 @@ graph* graphize(maze_map * pmap)
 
         temp_node = pgraph->nodes[temp];
 
-        if(temp_node.N.next == -1){
-            if((return_code = search_direction(temp,pgraph,N,pmap)) > 0){
+        if(temp_node.N.next == -1)
+        {
+            if((return_code = search_direction(temp,pgraph,N,pmap)) > 0)
+            {
                 if(push_queue(q, return_code) == -1)
                 {
                     return_code = MEMORY_REALLOCATION_ERROR;
                     goto messg;
                 }
-            } else goto messg;
+            } 
+            else if(return_code != IGNORE_NODE)
+                goto messg;
         }
 
-        if(temp_node.E.next == -1){
-            if((return_code = search_direction(temp,pgraph,E,pmap)) > 0){
+        if(temp_node.E.next == -1)
+        {
+            if((return_code = search_direction(temp,pgraph,E,pmap)) > 0)
+            {
                 if(push_queue(q, return_code) == -1)
                 {
                     return_code = MEMORY_REALLOCATION_ERROR;
                     goto messg;
                 }
-            } else goto messg;
+            } 
+            else if(return_code != IGNORE_NODE)
+                goto messg;
         }
 
-        if(temp_node.S.next == -1){
-            if((return_code = search_direction(temp,pgraph,S,pmap)) > 0){
+        if(temp_node.S.next == -1)
+        {
+            if((return_code = search_direction(temp,pgraph,S,pmap)) > 0)
+            {
                 if(push_queue(q, return_code) == -1)
                 {
                     return_code = MEMORY_REALLOCATION_ERROR;
                     goto messg;
                 }
-            } else goto messg;
+            } 
+            else if(return_code != IGNORE_NODE)
+                goto messg;
         }
 
-        if(temp_node.W.next == -1){
-            if((return_code = search_direction(temp,pgraph,W,pmap)) > 0){
+        if(temp_node.W.next == -1)
+        {
+            if((return_code = search_direction(temp,pgraph,W,pmap)) > 0)
+            {
                 if(push_queue(q, return_code) == -1)
                 {
                     return_code = MEMORY_REALLOCATION_ERROR;
                     goto messg;
                 }
-            } else goto messg;
+            }
+            else if(return_code != IGNORE_NODE)
+                goto messg;
         }
 
     }
