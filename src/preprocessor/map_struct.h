@@ -1,6 +1,6 @@
 #ifndef INCLUDE_map_struct_h_
 #define INCLUDE_map_struct_h_
-
+#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct _preprocessor_coords{

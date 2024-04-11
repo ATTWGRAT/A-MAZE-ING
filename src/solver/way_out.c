@@ -1,6 +1,4 @@
 #include "way_out.h"
-#include "graph_file_reader.h"
-#include "route.h"
 
 void print_way_out(route *s){
     printf("START\n");
@@ -67,70 +65,174 @@ void print_way_out(route *s){
 
 route* find_route(graph_file* gf)
 {
-    route* r = make_route();
-    node temp_node = read_single_node(gf->exit_node, gf);
-    unsigned int curr_len = temp_node.dj_length;
+    int exit_code;
     unsigned int temp_len;
+    unsigned int curr_len;
+
+    route* r = make_route();
+
+    if(r == NULL)
+    {
+        fprintf(stderr, "Błąd podczas alokacji pamięci!\n");
+        return NULL;
+    }
+
+    node temp_node = read_single_node(gf->exit_node, gf);
+
+    if(temp_node.nr < 0)
+    {
+        exit_code = gf->exit_node;
+        goto fileerror;
+    }
+
+    curr_len = temp_node.dj_length;
     
     while(curr_len != 0)
     {
 
-        if(temp_node.nextN.next != 0 && (temp_len = read_dj_length(temp_node.nextN.next, gf)) == curr_len - temp_node.nextN.length)
+        if(temp_node.nextN.next != 0) 
         {
-            linked_node ln = {.length = temp_node.nextN.length, .dir = S};
+            temp_len = read_dj_length(temp_node.nextN.next, gf);
 
-            push_route(r, ln);
+            if(temp_len < 0)
+            {
+                exit_code = temp_node.nextN.next;
+                goto fileerror;
+            }
 
-            curr_len = temp_len;
+            if(temp_len == curr_len - temp_node.nextN.length)
+            {
+                linked_node ln = {.length = temp_node.nextN.length, .dir = S};
 
-            temp_node = read_single_node(temp_node.nextN.next, gf);
+                if(push_route(r, ln) == -1)
+                    goto memerror;
 
-            continue;
+                curr_len = temp_len;
+
+                temp_node = read_single_node(temp_node.nextN.next, gf);
+
+                if(temp_node.nr < 0)
+                {
+                    exit_code = temp_node.nextN.next;
+                    goto fileerror;
+                }
+
+                continue;
+            }
+        }
+            
+        if(temp_node.nextE.next != 0 )
+        {
+            temp_len = read_dj_length(temp_node.nextE.next, gf);
+
+            if(temp_len < 0)
+            {
+                exit_code = temp_node.nextE.next;
+                goto fileerror;
+            }
+
+            if(temp_len == curr_len - temp_node.nextE.length)
+            {
+                linked_node ln = {.length = temp_node.nextE.length, .dir = W};
+
+                if(push_route(r, ln) == -1)
+                    goto memerror;
+
+                curr_len = temp_len;
+
+                temp_node = read_single_node(temp_node.nextE.next, gf);
+
+                if(temp_node.nr < 0)
+                {
+                    exit_code = temp_node.nextE.next;
+                    goto fileerror;
+                }
+
+                continue;
+            }
         }
 
-        if(temp_node.nextE.next != 0 && (temp_len = read_dj_length(temp_node.nextE.next, gf)) == curr_len - temp_node.nextE.length)
+
+        if(temp_node.nextS.next != 0)
         {
-            linked_node ln = {.length = temp_node.nextE.length, .dir = W};
+            temp_len = read_dj_length(temp_node.nextS.next, gf);
 
-            push_route(r, ln);
+            if(temp_len < 0)
+            {
+                exit_code = temp_node.nextS.next;
+                goto fileerror;
+            }
 
-            curr_len = temp_len;
+            if(temp_len == curr_len - temp_node.nextS.length)
+            {
+                linked_node ln = {.length = temp_node.nextS.length, .dir = N};
 
-            temp_node = read_single_node(temp_node.nextE.next, gf);
+                if(push_route(r, ln) == -1)
+                    goto memerror;
 
-            continue;
+                curr_len = temp_len;
+
+                temp_node = read_single_node(temp_node.nextS.next, gf);
+
+                if(temp_node.nr < 0)
+                {
+                    exit_code = temp_node.nextS.next;
+                    goto fileerror;
+                }
+
+                continue;
+            }
         }
 
 
-        if(temp_node.nextS.next != 0 && (temp_len = read_dj_length(temp_node.nextS.next, gf)) == curr_len - temp_node.nextS.length)
+        if(temp_node.nextW.next != 0)
         {
-            linked_node ln = {.length = temp_node.nextS.length, .dir = N};
+            temp_len = read_dj_length(temp_node.nextW.next, gf);
 
-            push_route(r, ln);
+            if(temp_len < 0)
+            {
+                exit_code = temp_node.nextW.next;
+                goto fileerror;
+            }
 
-            curr_len = temp_len;
+            if(temp_len == curr_len - temp_node.nextW.length)
+            {
+                linked_node ln = {.length = temp_node.nextW.length, .dir = E};
 
-            temp_node = read_single_node(temp_node.nextS.next, gf);
+                if(push_route(r, ln) == -1)
+                    goto memerror;
 
-            continue;
+                curr_len = temp_len;
+
+                temp_node = read_single_node(temp_node.nextW.next, gf);
+
+                if(temp_node.nr < 0)
+                {
+                    exit_code = temp_node.nextW.next;
+                    goto fileerror;
+                }
+
+                continue;
+            }
         }
 
-
-        if(temp_node.nextW.next != 0 && (temp_len = read_dj_length(temp_node.nextW.next, gf)) == curr_len - temp_node.nextW.length)
-        {
-            linked_node ln = {.length = temp_node.nextW.length, .dir = E};
-
-            push_route(r, ln);
-
-            curr_len = temp_len;
-
-            temp_node = read_single_node(temp_node.nextW.next, gf);
-
-            continue;
-        }
-
+        fprintf(stderr, "Nie znaleziono drogi od wejścia do wyjścia! Czy na pewno podano poprawny plik?\n");
+        free(r->array);
+        free(r);
         return NULL;
     }
 
     return r;
+
+fileerror:
+    fprintf(stderr, "Błąd podczas interakcji z plikiem! Węzeł nr: %d\n", exit_code);
+    free(r->array);
+    free(r);
+    return NULL;
+
+memerror:
+    fprintf(stderr, "Błąd podczas realokacji pamięci!\n");
+    free(r->array);
+    free(r);
+    return NULL;
 }

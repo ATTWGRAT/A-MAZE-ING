@@ -9,7 +9,7 @@
 
 typedef struct e {
     int next;
-    int length;
+    unsigned int length;
 } edge;
 
 typedef struct n {
@@ -18,7 +18,7 @@ typedef struct n {
     edge nextE;
     edge nextS;
     edge nextW;
-    unsigned int dj_length;
+    int dj_length;
 } node;
 
 typedef struct f{
@@ -30,6 +30,6 @@ typedef struct f{
 
 node read_single_node(int nr, graph_file* f);
 graph_file* open_processed_file(char* name);
-int write_dj_length(int nr, int length, graph_file* f);
+int write_dj_length(int nr, unsigned int length, graph_file* f);
 int read_dj_length(int nr, graph_file* gf);
 #endif

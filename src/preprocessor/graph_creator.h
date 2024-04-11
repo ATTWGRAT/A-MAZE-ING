@@ -3,7 +3,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include "map_struct.h"
+#include "queue.h"
 
 #define STRAIGHT 0
 #define INTERSECTION 1

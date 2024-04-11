@@ -1,5 +1,4 @@
 #include "map_reader.h"
-#include "map_struct.h"
 
 struct binary_file_header{
     int File_ID;

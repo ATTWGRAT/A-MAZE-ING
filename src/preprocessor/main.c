@@ -1,8 +1,5 @@
 #include <ctype.h>
-#include <stdio.h>
-#include <string.h>
 #include <unistd.h>
-#include <stdlib.h>
 #include "map_reader.h"
 #include "graph_creator.h"
 
@@ -55,7 +52,7 @@ args* parse_args(int argc, char** argv)
                 break;
 
             case 'h':
-                printf("Argumenty:\n\t-x <liczba naturalna> #liczba kolumn w labiryncie\n\t-y <liczba naturalna> #liczba wierszy w labiryncie\n\t-f <ścieżka do pliku z labiryntem>\nPrzykładowe wywołanie:\n\t./preprocessor -x 512 -y 512 -f maze-512x512.txt\n");
+                printf("Argumenty:\n\t-x <liczba naturalna> #liczba kolumn w labiryncie\n\t-y <liczba naturalna> #liczba wierszy w labiryncie\n\t-f <ścieżka do pliku z labiryntem>\n\t-c (jeśli plik jest skompresowany. Wtedy argumenty -x i -y nie są potrzebne.)\nPrzykładowe wywołanie:\n\t./preprocessor -x 512 -y 512 -f maze-512x512.txt\n");
                 return HELP_FLAG;
 
             case '?':
@@ -115,8 +112,6 @@ int main(int argc, char** argv)
          map = read_uncompressed(parsed_arguments->x, parsed_arguments->y, parsed_arguments->plik);
     else
          map = read_compressed(parsed_arguments->plik);
-
-    FILE* t = fopen("test", "w");
 
     fclose(parsed_arguments->plik);
     

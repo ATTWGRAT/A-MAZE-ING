@@ -6,10 +6,14 @@ graph_file* open_processed_file(char* name)
     
     FILE* file = fopen(name, "rb+");
 
-    if(file == NULL 
-        || fread( &(gf->exit_node), 4, 1, file ) != 1 
-        || fread( &(gf->nodes_amount), 4, 1, file ) !=1 )
+    if(file == NULL)
         goto stop;
+
+    if(fread( &(gf->exit_node), 4, 1, file ) != 1  || fread( &(gf->nodes_amount), 4, 1, file ) !=1 )
+    {
+        fclose(file);
+        goto stop;
+    }
 
     rewind(file);
 
@@ -64,7 +68,7 @@ node read_single_node(int nr, graph_file* f) //NODES START FROM 1
     return ret;
 }
 
-int write_dj_length(int nr, int length, graph_file* f)
+int write_dj_length(int nr, unsigned int length, graph_file* f)
 {
     if(fseek(f->file, (nr - f->curr_node)*NODE_OFFSET + DJ_LENGTH_OFFSET, SEEK_CUR))
         return -1;

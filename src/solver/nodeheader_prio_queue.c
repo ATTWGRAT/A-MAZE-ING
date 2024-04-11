@@ -1,16 +1,27 @@
-#include "snode_prio_queue.h"
-#include <stdio.h>
-queue make_queue() 
+#include "nodeheader_prio_queue.h"
+
+nh_queue* make_queue() 
 {
-    queue q;
-    q.size = 200;
-    q.last = -1;
-    q.first = -1;
-    q.array = malloc(200 * sizeof *q.array);
+    nh_queue* q = malloc(sizeof *q);
+
+    if(q == NULL)
+        return NULL;
+
+    q->size = 200;
+    q->last = -1;
+    q->first = -1;
+    q->array = malloc(200 * sizeof *q->array);
+
+    if(q->array == NULL)
+    {
+        free(q);
+        return NULL;
+    }
+
     return q;
 }
 
-char push_queue(queue *queue, snode p) 
+char push_queue(nh_queue *queue, node_header p) 
 {
     if (queue->first == -1) 
     {
@@ -40,7 +51,7 @@ char push_queue(queue *queue, snode p)
     } 
     else if (queue->first - 1 == queue->last) 
     {
-        snode *temp = malloc((queue->size + 200) * sizeof *(queue->array));
+        node_header *temp = malloc((queue->size + 200) * sizeof *(queue->array));
 
         if (temp == NULL) 
         {
@@ -92,12 +103,12 @@ char push_queue(queue *queue, snode p)
     return 0;
 }
 
-snode peek_queue(queue *queue) { return queue->array[queue->first]; }
+node_header peek_queue(nh_queue *queue) { return queue->array[queue->first]; }
 
-snode pop_queue(queue *queue) 
+node_header pop_queue(nh_queue *queue) 
 {
     if (queue->first == queue->last) {
-        snode p = queue->array[queue->first];
+        node_header p = queue->array[queue->first];
         queue->first = -1;
         queue->last = -1;
         return p;
@@ -109,7 +120,7 @@ snode pop_queue(queue *queue)
     return queue->array[queue->first++];
 }
 
-char is_queue_empty(queue *queue) 
+char is_queue_empty(nh_queue *queue) 
 {
     if (queue->first == -1) {
         return 1;

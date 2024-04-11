@@ -1,5 +1,4 @@
 #include "graph_creator.h"
-#include "queue.h"
 
 graph* init_graph()
 {
@@ -366,7 +365,7 @@ freeall:
 int write_graph(graph* pgraph, FILE* out)
 {
     int buffer[9] = {pgraph->exit_index+1, pgraph->length, 0, 0, 0, 0, 0, 0};
-    buffer[8] = 0xFFFFFFFF;
+    buffer[8] = INT_MAX;
 
     node temp;
 

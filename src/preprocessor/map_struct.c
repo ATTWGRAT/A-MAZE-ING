@@ -1,5 +1,4 @@
 #include "map_struct.h"
-#include <stdio.h>
 
 void free_maze_map(maze_map* map)
 {
