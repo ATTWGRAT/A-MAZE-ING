@@ -1,29 +1,69 @@
 #include "graph_file_reader.h"
+#include <stdio.h>
+
+FILE* copy_to_temp(FILE* src)
+{
+    int read;
+
+    char buffer[1024];
+
+    FILE* new_file = tmpfile();
+
+    if(new_file == NULL)
+        return NULL;
+
+    while(!feof(src))
+    {
+        read = fread(buffer, 1, 1024, src);
+
+        if(fwrite(buffer, 1, read, new_file) != read)
+            return NULL;
+    }
+
+    rewind(new_file);
+
+    return new_file;
+}
 
 graph_file* open_processed_file(char* name)
 {
+    FILE* file = fopen(name, "rb");
+
     graph_file* gf = malloc(sizeof *gf);
     
-    FILE* file = fopen(name, "rb+");
-
     if(file == NULL)
-        goto stop;
-
-    if(fread( &(gf->exit_node), 4, 1, file ) != 1  || fread( &(gf->nodes_amount), 4, 1, file ) !=1 )
     {
+        fprintf(stderr, "Błąd podczas otwierania pliku %s\n", name);
+        goto stop;
+    }
+
+    if(fread(&(gf->exit_node), 4, 1, file ) != 1  || fread( &(gf->nodes_amount), 4, 1, file ) !=1 )
+    {
+        fprintf(stderr, "Błąd podczas czytania z pliku!\n");
         fclose(file);
         goto stop;
     }
 
     rewind(file);
 
-    gf->file = file;
+    FILE* temporary_file = copy_to_temp(file);
+
+    fclose(file);
+
+    if(temporary_file == NULL)
+    {
+        fprintf(stderr, "Błąd podczas tworzenia pliku tymczasowego\n");
+        goto stop;
+    }
+    
+    gf->file = temporary_file;
     gf->curr_node = 0;
+
     return gf;
 
-stop: 
-     free(gf);
-     return NULL;
+stop:
+    free(gf);
+    return NULL;
 
 }
 
