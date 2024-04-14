@@ -8,5 +8,4 @@ void free_maze_map(maze_map* map)
     free(map->maze);
     free(map);
 
-    printf("Zwolniono mapę\n");
 }

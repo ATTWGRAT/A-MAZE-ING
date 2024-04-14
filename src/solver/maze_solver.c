@@ -82,7 +82,7 @@ int dj_solve(graph_file* gf)
                 if(push_queue(snq, new_nh) == -1)
                     goto memerror;
 
-                if(new_nh.nr == gf->exit_node)
+                if(new_len < ex_length && new_nh.nr == gf->exit_node)
                     ex_length = new_len;
             }
         }
@@ -113,7 +113,7 @@ int dj_solve(graph_file* gf)
                 if(push_queue(snq, new_nh) == -1)
                     goto memerror;
 
-                if(new_nh.nr == gf->exit_node)
+                if(new_len < ex_length && new_nh.nr == gf->exit_node)
                     ex_length = new_len;
             }
         }
@@ -144,7 +144,7 @@ int dj_solve(graph_file* gf)
                 if(push_queue(snq, new_nh) == -1)
                     goto memerror;
 
-                if(new_nh.nr == gf->exit_node)
+                if(new_len < ex_length && new_nh.nr == gf->exit_node)
                     ex_length = new_len;
             }
         }
@@ -175,7 +175,7 @@ int dj_solve(graph_file* gf)
                 if(push_queue(snq, new_nh) == -1)
                     goto memerror;
 
-                if(new_nh.nr == gf->exit_node)
+                if(new_len < ex_length && new_nh.nr == gf->exit_node)
                     ex_length = new_len;
             }
         }

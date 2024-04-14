@@ -1,4 +1,5 @@
 #include "map_reader.h"
+#include "map_struct.h"
 
 struct binary_file_header{
     int File_ID;
@@ -114,7 +115,7 @@ int check_line_start_end(int x, int y, int line_nr, char* buffer, maze_map* pmap
             break;
 
         default:
-            fprintf(stderr, "Błędny znak napotkany podczass wczytywania pliku: %d linia 1 znak: %c\n", line_nr+1, buffer[0]);
+            fprintf(stderr, "Błędny znak napotkany podczas wczytywania pliku: %d linia 1 znak: %c\n", line_nr+1, buffer[0]);
             free(buffer);
             free_maze_map(pmap);
             return -1;
@@ -274,6 +275,20 @@ maze_map* read_uncompressed(int x, int y, FILE* file)
         return NULL;
 
     free(buffer);
+
+    if(pmap->entrance.x == -1)
+    {
+        fprintf(stderr, "Błędny format pliku - brak wejścia!\n");
+        free_maze_map(pmap);
+        return NULL;
+    }
+
+    if(pmap->exit.x == -1)
+    {
+        fprintf(stderr, "Błędny format pliku - brak wyjścia!\n");
+        free_maze_map(pmap);
+        return NULL;
+    }
 
     return pmap;
 
