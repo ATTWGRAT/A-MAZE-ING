@@ -44,6 +44,6 @@ typedef struct _preprocessor_graph{
 
 graph* graphize(maze_map*);
 
-int write_graph(graph*, FILE*);
+int write_graph_to_file(graph*, FILE*);
 
 #endif

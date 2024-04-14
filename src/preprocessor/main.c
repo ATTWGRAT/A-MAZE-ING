@@ -155,7 +155,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    if(write_graph(g, out) == -1)
+    if(write_graph_to_file(g, out) == -1)
     {
         free(g);
         free(parsed_arguments);

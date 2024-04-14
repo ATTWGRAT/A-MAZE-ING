@@ -362,7 +362,7 @@ freeall:
 
 }
 
-int write_graph(graph* pgraph, FILE* out)
+int write_graph_to_file(graph* pgraph, FILE* out)
 {
     int buffer[9] = {pgraph->exit_index+1, pgraph->length, 0, 0, 0, 0, 0, 0};
     buffer[8] = INT_MAX;
