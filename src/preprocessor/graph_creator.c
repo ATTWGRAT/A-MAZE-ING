@@ -351,8 +351,6 @@ messg:
 
     }
 
-
-freeall:
     free(pgraph->nodes);
     free(pgraph);
     free(q->array);
