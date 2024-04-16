@@ -337,6 +337,9 @@ graph* graphize(maze_map * pmap)
 
     }
 
+    free(q->array);
+    free(q);
+
     return pgraph;
 
 
